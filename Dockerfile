@@ -90,7 +90,7 @@ RUN if [ -n "$HF_TKN_FILE" ]; then \
       echo "No Hugging Face token file specified, skipping token setup"; \
     fi
 
-EXPOSE 8000
+EXPOSE 8200
 
 ENTRYPOINT ["whisperlivekit-server", "--host", "0.0.0.0" , "--ssl-keyfile", "/certs/server.key", "--ssl-certfile", "/certs/server.crt"]
 
