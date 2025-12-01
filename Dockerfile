@@ -3,7 +3,7 @@ FROM nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+
 
 ARG EXTRAS
 ARG HF_PRECACHE_DIR
@@ -11,6 +11,7 @@ ARG HF_TKN_FILE
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        openssl \
         python3 \
         python3-pip \
         python3-venv \
@@ -20,6 +21,19 @@ RUN apt-get update && \
         python3-dev \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
+
+# 创建证书目录
+RUN mkdir -p /certs
+
+# 生成自签名证书（有效期 365 天）
+RUN openssl req -x509 -nodes -days 365 \
+    -newkey rsa:2048 \
+    -keyout /certs/server.key \
+    -out /certs/server.crt \
+    -subj "/CN=localhost"
+
+
+WORKDIR /app
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
@@ -78,6 +92,6 @@ RUN if [ -n "$HF_TKN_FILE" ]; then \
 
 EXPOSE 8000
 
-ENTRYPOINT ["whisperlivekit-server", "--host", "0.0.0.0"]
+ENTRYPOINT ["whisperlivekit-server", "--host", "0.0.0.0" , "--ssl-keyfile", "/certs/server.key", "--ssl-certfile", "/certs/server.crt"]
 
 CMD ["--model", "medium"]
