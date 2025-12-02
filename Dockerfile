@@ -94,4 +94,4 @@ EXPOSE 8200
 
 ENTRYPOINT ["whisperlivekit-server", "--host", "0.0.0.0" , "--port", "8200" , "--ssl-keyfile", "/certs/server.key", "--ssl-certfile", "/certs/server.crt"]
 
-CMD ["--model", "medium"]
+CMD ["--model", "large-v3"]
